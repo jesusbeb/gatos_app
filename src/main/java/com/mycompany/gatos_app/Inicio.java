@@ -1,5 +1,6 @@
 package com.mycompany.gatos_app;
 
+import java.io.IOException;
 import javax.swing.JOptionPane;
 
 /* Creamos un nuevo proyecto
@@ -10,11 +11,14 @@ nombre de la dependencia.
 b) Vamos a https://mvnrepository.com/ y en Search tecleamos el nombre de la 
 dependencia, escogemos la version, copiamos el codigo para Maven y lo pegamos 
 dentro de <dependencies> en el pom.xml
+En caso de que Apache Netbeans no cargue automaticamente las dependencias, se 
+puede dar clic derecho en el proyecto y seleccionar Reload Project, o Build o 
+Build with Dependencies o Clean and Build
 */
 
 public class Inicio {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         //
         int opcionMenu = -1;
         //Array de tipo String con los botones del menu
