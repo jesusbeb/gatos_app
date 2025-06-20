@@ -1,3 +1,5 @@
-com\mycompany\gatos_app\Inicio.class
+com\mycompany\gatos_app\Imagex.class
 com\mycompany\gatos_app\Gatos.class
 com\mycompany\gatos_app\GatosService.class
+com\mycompany\gatos_app\GatosFav.class
+com\mycompany\gatos_app\Inicio.class

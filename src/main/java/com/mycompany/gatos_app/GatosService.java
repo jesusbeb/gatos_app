@@ -73,7 +73,8 @@ public class GatosService {
             //Texto a mostrar en la ventana donde se ven las imagenes
             String menu = "Opciones: " ;                 
             
-            String[] opciones = {"1. Ver otra imagen", "2. Favorito", "3. Volver"};
+            String[] opciones = {"1. Ver otra imagen", "2. Agregar a favoritos", 
+                "3. Ver favoritos", "4. Volver"};
             //Obtenemos el id de la imagen para mostrarlo en la ventana
             String id_gato = gatos.getUrl(); //gatos.getId();
             String opcion = (String) JOptionPane.showInputDialog(null, menu, id_gato, 
@@ -92,7 +93,11 @@ public class GatosService {
                     verGatos();
                     break;
                 case 1:
-                    favoritoGato(gatos);
+                    agregarFavorito(gatos);
+                    break;
+                case 2:                    
+                    Gatos gato = new Gatos();
+                    verFavoritos(gato.getApikey());
                     break;
                 default:
                     break;
@@ -109,7 +114,7 @@ public class GatosService {
     //un metodo POST para hacer una peticion de marcar una imagen como favorita y 
     //ya que se realizo exitosamente, vemos el codigo que uso Postman, lo copiamos y
     //pegamos aqui y eliminamos algunas cabeceras que no ocuparemos.
-    public static void favoritoGato(Gatos gato){
+    public static void agregarFavorito(Gatos gato){
         
         try{
             OkHttpClient client = new OkHttpClient();
@@ -125,6 +130,100 @@ public class GatosService {
         } catch(IOException e){
             System.out.println(e);
         }
+    }
+    
+    
+    //Para obtener la lista de favoritos que se han agregado, igual buscamos
+    //en la documentacion de la API para saber como construir la peticion GET dentro de
+    //Postman.
+    
+    public static void verFavoritos(String apiKey) throws IOException{
+            
+            //Codigo obtenido con POSTMAN para solicitar los favoritos a la API
+            OkHttpClient client = new OkHttpClient();
+            
+            Request request = new Request.Builder().url("https://api.thecatapi.com/v1/favourites")
+                    .get()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("x-api-key", apiKey)
+                    .build();            
+            Response response = client.newCall(request).execute();
+            
+            //Guardamos el json de la respuesta de la API
+            String elJson = response.body().string();
+           
+            //Creamos objeto de tipo Gson para parsear el Sring con la respuesta
+            Gson gson = new Gson();
+            
+            //Creamos un arreglo de GatosFav para guardar los json que vienen dentro
+            //del json de la respuesta, que son los gatos favoritos
+            GatosFav[] gatosArray = gson.fromJson(elJson, GatosFav[].class);
+            
+            //Validamos que si haya gatos marcados como favoritos
+            //Creamos un numero aleatorio para obtener un gato favorito aleatorio,
+            //del arreglo de gatos
+            if(gatosArray.length > 0){
+                int min = 1;
+                int max = gatosArray.length;
+                int aleatorio = (int) ( Math.random() * ((max-min)+1) ) + min;
+                int indice = aleatorio-1;
+                
+                GatosFav gatoFav = gatosArray[indice];
+
+                //Obtenemos la imagen del gato favorito
+                Image image = null;
+                try{
+                    URL url = new URL(gatoFav.getImage().getUrl());
+                    image = ImageIO.read(url);
+
+                    //Convertimos la imagen a ImageIcon
+                    ImageIcon fondoGato = new ImageIcon(image);
+                  
+                    //Redimensionamos de ser necesario
+                    if(fondoGato.getIconWidth() > 800){
+                        Image fondo = fondoGato.getImage();
+                        Image modificada = fondo.getScaledInstance(800, 600, java.awt.Image.SCALE_SMOOTH);
+                        fondoGato = new ImageIcon(modificada);
+                    }
+
+                    //Empezamos con la UI
+                    //Texto a mostrar en la ventana donde se ven las imagenes
+                    String menu = "Opciones: " ;                 
+                    String[] opciones = {"1. Ver otro favorito", "2. Eliminar favorito", 
+                        " 3. Volver"};
+                    //Obtenemos la url de la imagen para mostrarlo en la ventana
+                    String id_gato = "Favorito: " +gatoFav.getImage().getUrl();
+                    String opcion = (String) JOptionPane.showInputDialog(null, menu, id_gato, 
+                            JOptionPane.INFORMATION_MESSAGE, fondoGato, opciones, opciones[0]);
+
+                    //Validamos la opcion que escoge el usuario
+                    int seleccion = -1;
+                    for(int i=0; i<opciones.length; i++){
+                        if(opcion.equals(opciones[i])){
+                            seleccion = i;
+                        }
+                    }
+
+                    switch(seleccion){
+                        case 0:                            
+                            verFavoritos(gatoFav.getApikey());
+                            break;
+                        case 1:
+                            eliminarFavorito(gatoFav);
+                            break;
+                        default:
+                            break;
+                    }
+
+                } catch(IOException e){
+                    System.out.println(e);
+                }
+
+                    }                             
+    }
+    
+    public static void eliminarFavorito(GatosFav gatofav){
+        
     }
     
 }
